@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+<title>Сапёр</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Jura:wght@500;700&family=PT+Sans:wght@400;700&display=swap">
+<style>
+  /* Layout: a survey sheet. Covered ground is slate tiles lifted off the paper; cleared ground is the bare sheet with figures on it. The two counters are the only loud type. */
+  :root {
+    --bg: #EEF0EC;
+    --ink: #1A2227;
+    --muted: #59656B;
+    --line: #C5CBCA;
+    --card: #F8F9F6;
+    --accent: #1B5E8C;
+    --on-accent: #FFFFFF;
+    --sheet: #DDE2DF;
+    --open: #F5F6F2;
+    --cover: #84959F;
+    --cover-hi: #9BAAB3;
+    --cover-press: #6E7F89;
+    --on-cover: #F6F8F8;
+    --flag: #D03A2D;
+    --mine: #1F272C;
+    --boom: #F0A99F;
+    --n1: #1D5FC2;
+    --n2: #2A7A3A;
+    --n3: #C22F2A;
+    --n4: #3D3BA3;
+    --n5: #8A2A20;
+    --n6: #0D7A82;
+    --n7: #1A2227;
+    --n8: #68737A;
+    --display: "Jura", "Trebuchet MS", "Segoe UI", sans-serif;
+    --body: "PT Sans", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171A;
+      --ink: #E6ECEE;
+      --muted: #94A1A7;
+      --line: #2B343A;
+      --card: #1B2226;
+      --accent: #7DB9E8;
+      --on-accent: #0B1B28;
+      --sheet: #171D21;
+      --open: #222A30;
+      --cover: #52626D;
+      --cover-hi: #63747F;
+      --cover-press: #43515B;
+      --on-cover: #EEF2F3;
+      --flag: #F0645A;
+      --mine: #E6ECEE;
+      --boom: #7A2D28;
+      --n1: #7FB0FF;
+      --n2: #74D08A;
+      --n3: #FF8A80;
+      --n4: #B3ADFF;
+      --n5: #E8A07A;
+      --n6: #63D6D6;
+      --n7: #E6ECEE;
+      --n8: #9AA6AC;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171A;
+    --ink: #E6ECEE;
+    --muted: #94A1A7;
+    --line: #2B343A;
+    --card: #1B2226;
+    --accent: #7DB9E8;
+    --on-accent: #0B1B28;
+    --sheet: #171D21;
+    --open: #222A30;
+    --cover: #52626D;
+    --cover-hi: #63747F;
+    --cover-press: #43515B;
+    --on-cover: #EEF2F3;
+    --flag: #F0645A;
+    --mine: #E6ECEE;
+    --boom: #7A2D28;
+    --n1: #7FB0FF;
+    --n2: #74D08A;
+    --n3: #FF8A80;
+    --n4: #B3ADFF;
+    --n5: #E8A07A;
+    --n6: #63D6D6;
+    --n7: #E6ECEE;
+    --n8: #9AA6AC;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.45;
+    padding-inline: 16px;
+    padding-block: 14px 22px;
+  }
+  .app {
+    width: min(100%, 760px);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  button { font: inherit; color: inherit; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 10px 12px; flex-wrap: wrap; }
+  h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+  .seg button {
+    font-size: 14px;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    border-left: 1px solid var(--line);
+    padding: 6px 11px;
+    cursor: pointer;
+  }
+  .seg button:first-child { border-left: 0; }
+  .seg button[aria-pressed="true"] { color: var(--on-accent); background: var(--accent); font-weight: 700; }
+  .seg button:focus-visible { outline-offset: -2px; }
+  .seg.small button { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 9px; }
+  .btn {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .btn:hover { border-color: var(--muted); }
+  .btn.primary { color: var(--on-accent); background: var(--accent); border-color: var(--accent); font-weight: 700; }
+
+  .stats { display: flex; align-items: flex-end; gap: 10px 28px; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+  .stat-l {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .stat-n { font-family: var(--mono); font-weight: 700; font-size: 40px; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .stat-n.small { font-weight: 500; font-size: 18px; line-height: 1.5; }
+  .stat.push { margin-left: auto; align-items: flex-end; text-align: right; }
+
+  .field {
+    display: flex;
+    justify-content: center;
+    background: var(--sheet);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 6px;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  .field:focus { outline: none; }
+  .field.kb:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .field canvas { display: block; max-width: 100%; touch-action: manipulation; cursor: pointer; }
+
+  .status { margin: 0; min-height: 1.45em; font-weight: 700; }
+  .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .note { margin: 0; color: var(--muted); font-size: 14px; max-width: 68ch; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <h1 id="title">Сапёр</h1>
+    <span class="seg small" role="group" aria-label="Язык / Language">
+      <button type="button" id="langRu" aria-pressed="true">RU</button>
+      <button type="button" id="langEn" aria-pressed="false">EN</button>
+    </span>
+  </header>
+
+  <div class="bar">
+    <span class="seg" role="group" id="diffs" aria-label="Сложность">
+      <button type="button" id="d-beginner" data-diff="beginner" aria-pressed="true">Новичок</button>
+      <button type="button" id="d-inter" data-diff="inter" aria-pressed="false">Любитель</button>
+      <button type="button" id="d-expert" data-diff="expert" aria-pressed="false">Профессионал</button>
+    </span>
+    <button class="btn" id="newGame" type="button">Новая игра</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-l" id="leftL">Мин осталось</span><span class="stat-n" id="left">10</span></div>
+    <div class="stat"><span class="stat-l" id="timeL">Время</span><span class="stat-n" id="time">0</span></div>
+    <div class="stat push"><span class="stat-l" id="bestL">Рекорд</span><span class="stat-n small" id="best">–</span><span class="stat-l" id="sizeL">Поле 9 × 9, мин: 10</span></div>
+  </div>
+
+  <div class="field" id="field" tabindex="0" role="application" aria-label="Минное поле">
+    <canvas id="cv"></canvas>
+  </div>
+
+  <p class="status" id="status" aria-live="polite">Откройте любую клетку. Первая всегда безопасна.</p>
+
+  <div class="controls">
+    <span class="seg" role="group" id="modes" aria-label="Действие по нажатию">
+      <button type="button" id="m-dig" data-mode="dig" aria-pressed="true">Копать</button>
+      <button type="button" id="m-flag" data-mode="flag" aria-pressed="false">Флажок</button>
+    </span>
+    <button class="btn" id="sound" type="button" aria-pressed="true">Звук: вкл</button>
+  </div>
+
+  <p class="note" id="note"></p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // The three classic field sizes.
+  var DIFFS = { beginner: { c: 9, r: 9, m: 10 }, inter: { c: 16, r: 16, m: 40 }, expert: { c: 30, r: 16, m: 99 } };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var elField = $('field'), cv = $('cv'), ctx = cv.getContext('2d'), elStatus = $('status');
+
+  /* ---------- storage (optional) ---------- */
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v === null ? fallback : v; } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, String(value)); } catch (e) { /* storage is optional */ }
+  }
+  function loadJson(key, fallback) {
+    try { var v = JSON.parse(load(key, 'null')); return v === null ? fallback : v; } catch (e) { return fallback; }
+  }
+
+  /* ---------- language ---------- */
+  var STR = {
+    ru: {
+      title: 'Сапёр', newGame: 'Новая игра', diffs: 'Сложность',
+      beginner: 'Новичок', inter: 'Любитель', expert: 'Профессионал',
+      left: 'Мин осталось', time: 'Время', best: 'Рекорд', size: 'Поле {c} × {r}, мин: {m}', unit: 'с',
+      field: 'Минное поле {c} на {r}. Стрелки двигают курсор, пробел открывает клетку, F ставит флажок',
+      modes: 'Действие по нажатию', dig: 'Копать', flag: 'Флажок',
+      soundOn: 'Звук: вкл', soundOff: 'Звук: выкл',
+      ready: 'Откройте любую клетку. Первая всегда безопасна.',
+      play: 'Число показывает, сколько мин вокруг клетки.',
+      won: 'Поле разминировано за {t}.', wonBest: 'Поле разминировано за {t}. Это новый рекорд.',
+      lost: 'Вы наступили на мину. Неверные флажки перечёркнуты.',
+      note: 'Мышь: левая кнопка открывает клетку, правая ставит флажок. Нажатие на открытое число открывает соседние клетки, если флажков вокруг столько же. Телефон: нажатие открывает, долгое нажатие ставит флажок; переключатель под полем меняет их местами. Клавиатура: стрелки, пробел, F.'
+    },
+    en: {
+      title: 'Minesweeper', newGame: 'New game', diffs: 'Difficulty',
+      beginner: 'Beginner', inter: 'Intermediate', expert: 'Expert',
+      left: 'Mines left', time: 'Time', best: 'Best', size: 'Field {c} × {r}, mines: {m}', unit: 's',
+      field: 'Minefield {c} by {r}. Arrow keys move the cursor, Space opens a cell, F plants a flag',
+      modes: 'Tap action', dig: 'Dig', flag: 'Flag',
+      soundOn: 'Sound: on', soundOff: 'Sound: off',
+      ready: 'Open any cell. The first one is always safe.',
+      play: 'A number tells how many mines touch the cell.',
+      won: 'Field cleared in {t}.', wonBest: 'Field cleared in {t}. That is a new best.',
+      lost: 'You stepped on a mine. Wrong flags are crossed out.',
+      note: 'Mouse: the left button opens a cell, the right button plants a flag. Clicking an open number opens its neighbours when that many flags surround it. Phone: a tap opens, a long press plants a flag; the switch under the field swaps the two. Keyboard: arrow keys, Space, F.'
+    }
+  };
+  // a saved choice wins; otherwise Russian for anyone who lists it among their browser languages
+  function pickLang() {
+    var saved = load('saper-lang', '');
+    if (saved === 'ru' || saved === 'en') return saved;
+    var list = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+    for (var k = 0; k < list.length; k++) if (String(list[k]).toLowerCase().indexOf('ru') === 0) return 'ru';
+    return 'en';
+  }
+  var lang = pickLang();
+  function fmtTime(tenths) {
+    return (tenths / 10).toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' ' + STR[lang].unit;
+  }
+  function tr(key, params) {
+    var text = STR[lang][key];
+    if (!params) return text;
+    for (var k in params) text = text.replace('{' + k + '}', k === 't' ? fmtTime(params[k]) : params[k]);
+    return text;
+  }
+  var lastSay = ['ready', null];
+  function say(key, params) { lastSay = [key, params || null]; elStatus.textContent = tr(key, params); }
+
+  /* ---------- theme tokens for the canvas ---------- */
+  var T = {};
+  function readTokens() {
+    var cs = getComputedStyle(document.documentElement);
+    ['open', 'cover', 'cover-hi', 'cover-press', 'on-cover', 'flag', 'mine', 'boom', 'ink', 'accent',
+     'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8'].forEach(function (k) { T[k] = cs.getPropertyValue('--' + k).trim(); });
+    dirty = true;
+  }
+
+  /* ---------- sound ---------- */
+  var actx = null;
+  var soundOn = load('saper-sound', '1') === '1';
+  function tone(freq, dur, type, gain, delay, slideTo) {
+    if (!soundOn) return;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      actx = actx || new AC();
+      if (actx.state === 'suspended') actx.resume();
+      var t0 = actx.currentTime + (delay || 0);
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t0);
+      if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+      g.gain.setValueAtTime(gain, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t0); o.stop(t0 + dur + 0.02);
+    } catch (e) { /* sound is optional */ }
+  }
+
+  /* ---------- state ---------- */
+  var diff = 'beginner';
+  var cols = 9, rows = 9, mineCount = 10;
+  var mine, adj, open, flag;
+  var status = 'ready';      // 'ready' (no mines laid yet) | 'play' | 'won' | 'lost'
+  var opened = 0, flags = 0, boomAt = -1;
+  var baseMs = 0, tickStart = 0;   // the clock runs from the first opened cell
+  var mode = load('saper-mode', 'dig') === 'flag' ? 'flag' : 'dig';
+  var best = loadJson('saper-best', {});
+  var cursor = 0, kb = false, pressed = -1;
+  var cell = 32, dpr = 1, dirty = true, shownSec = -1;
+
+  function elapsed() { return baseMs + (tickStart ? performance.now() - tickStart : 0); }
+  function stopClock() { baseMs = elapsed(); tickStart = 0; }
+
+  function around(i, fn) {
+    var x = i % cols, y = (i / cols) | 0;
+    for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
+      if (!dx && !dy) continue;
+      var nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < cols && ny < rows) fn(ny * cols + nx);
+    }
+  }
+  function countAdjacent() {
+    for (var i = 0; i < cols * rows; i++) {
+      var n = 0;
+      around(i, function (j) { n += mine[j]; });
+      adj[i] = n;
+    }
+  }
+
+  // On a narrow screen the widest field is turned on its side so the cells stay big enough to tap.
+  function dimsFor(d) {
+    var D = DIFFS[d], c = D.c, r = D.r, avail = (elField.clientWidth || 360) - 14;
+    if (c > r && Math.floor(avail / c) < 20) { c = D.r; r = D.c; }
+    return { c: c, r: r, m: D.m };
+  }
+  function setField(c, r, m) {
+    cols = c; rows = r; mineCount = m;
+    var n = c * r;
+    mine = new Uint8Array(n); adj = new Uint8Array(n); open = new Uint8Array(n); flag = new Uint8Array(n);
+    opened = 0; flags = 0; boomAt = -1; baseMs = 0; tickStart = 0; pressed = -1;
+    cursor = Math.min(cursor, n - 1);
+  }
+  function newGame(d) {
+    diff = DIFFS[d] ? d : 'beginner';
+    save('saper-diff', diff);
+    var dims = dimsFor(diff);
+    setField(dims.c, dims.r, dims.m);
+    status = 'ready';
+    say('ready');
+    layout(); paintHud(); persist();
+  }
+
+  // Mines go down after the first click, away from that cell and its neighbours, so the first click
+  // always opens some ground.
+  function placeMines(first) {
+    var n = cols * rows, keep = new Uint8Array(n), pool = [], i;
+    keep[first] = 1;
+    around(first, function (j) { keep[j] = 1; });
+    for (i = 0; i < n; i++) if (!keep[i]) pool.push(i);
+    if (pool.length < mineCount) { pool = []; for (i = 0; i < n; i++) if (i !== first) pool.push(i); }
+    for (i = 0; i < mineCount; i++) {
+      var k = i + ((Math.random() * (pool.length - i)) | 0), t = pool[i];
+      pool[i] = pool[k]; pool[k] = t;
+      mine[pool[i]] = 1;
+    }
+    countAdjacent();
+  }
+
+  function openFrom(i) {
+    var stack = [i];
+    while (stack.length) {
+      var c = stack.pop();
+      if (open[c] || flag[c]) continue;
+      open[c] = 1; opened++;
+      if (!adj[c]) around(c, function (j) { if (!open[j] && !flag[j]) stack.push(j); });
+    }
+  }
+  function over() { return status === 'won' || status === 'lost'; }
+
+  function reveal(i) {
+    if (over() || open[i] || flag[i]) return;
+    if (status === 'ready') {
+      placeMines(i);
+      status = 'play';
+      baseMs = 0; tickStart = performance.now();
+      say('play');
+    }
+    if (mine[i]) { lose(i); return; }
+    openFrom(i);
+    tone(420, 0.05, 'triangle', 0.05);
+    afterMove();
+  }
+  // a click on an open number opens its neighbours once that many flags surround it
+  function chord(i) {
+    if (status !== 'play' || !open[i] || !adj[i]) return;
+    var marked = 0, todo = [];
+    around(i, function (j) { if (flag[j]) marked++; else if (!open[j]) todo.push(j); });
+    if (marked !== adj[i] || !todo.length) return;
+    for (var k = 0; k < todo.length; k++) if (mine[todo[k]]) { lose(todo[k]); return; }
+    for (k = 0; k < todo.length; k++) openFrom(todo[k]);
+    tone(420, 0.05, 'triangle', 0.05);
+    afterMove();
+  }
+  function toggleFlag(i) {
+    if (over() || open[i]) return;
+    flag[i] = flag[i] ? 0 : 1;
+    flags += flag[i] ? 1 : -1;
+    tone(flag[i] ? 660 : 500, 0.06, 'square', 0.035);
+    paintHud(); persist();
+  }
+  function afterMove() {
+    if (opened === cols * rows - mineCount) { win(); return; }
+    paintHud(); persist();
+  }
+  function lose(i) {
+    stopClock();
+    status = 'lost'; boomAt = i;
+    say('lost');
+    tone(160, 0.5, 'sawtooth', 0.09, 0, 50);
+    paintHud(); persist();
+  }
+  function win() {
+    stopClock();
+    status = 'won';
+    for (var i = 0; i < cols * rows; i++) if (mine[i] && !flag[i]) { flag[i] = 1; flags++; }
+    var tenths = Math.max(1, Math.round(baseMs / 100));
+    var record = !best[diff] || tenths < best[diff];
+    if (record) { best[diff] = tenths; save('saper-best', JSON.stringify(best)); }
+    say(record ? 'wonBest' : 'won', { t: tenths });
+    [523, 659, 784, 1047].forEach(function (f, n) { tone(f, 0.2, 'triangle', 0.08, n * 0.08); });
+    paintHud(); persist();
+  }
+
+  // what a plain click or tap does to a cell
+  function primary(i) {
+    if (open[i]) chord(i);
+    else if (mode === 'flag') toggleFlag(i);
+    else reveal(i);
+  }
+  function secondary(i) {
+    if (open[i]) return;
+    if (mode === 'flag') reveal(i); else toggleFlag(i);
+  }
+
+  /* ---------- HUD ---------- */
+  function paintHud() {
+    $('left').textContent = mineCount - flags;
+    $('best').textContent = best[diff] ? fmtTime(best[diff]) : '–';
+    $('sizeL').textContent = tr('size', { c: cols, r: rows, m: mineCount });
+    $('newGame').classList.toggle('primary', over());
+    elField.setAttribute('aria-label', tr('field', { c: cols, r: rows }));
+    var ds = $('diffs').children;
+    for (var i = 0; i < ds.length; i++) ds[i].setAttribute('aria-pressed', ds[i].getAttribute('data-diff') === diff ? 'true' : 'false');
+    paintTime(true);
+    dirty = true;
+  }
+  function paintTime(force) {
+    var s = Math.floor(elapsed() / 1000);
+    if (force || s !== shownSec) { shownSec = s; $('time').textContent = s; }
+  }
+  function paintSwitches() {
+    $('sound').textContent = soundOn ? tr('soundOn') : tr('soundOff');
+    $('sound').setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+    $('m-dig').setAttribute('aria-pressed', mode === 'dig' ? 'true' : 'false');
+    $('m-flag').setAttribute('aria-pressed', mode === 'flag' ? 'true' : 'false');
+  }
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.title = tr('title');
+    $('title').textContent = tr('title');
+    $('newGame').textContent = tr('newGame');
+    $('diffs').setAttribute('aria-label', tr('diffs'));
+    $('d-beginner').textContent = tr('beginner');
+    $('d-inter').textContent = tr('inter');
+    $('d-expert').textContent = tr('expert');
+    $('leftL').textContent = tr('left');
+    $('timeL').textContent = tr('time');
+    $('bestL').textContent = tr('best');
+    $('modes').setAttribute('aria-label', tr('modes'));
+    $('m-dig').textContent = tr('dig');
+    $('m-flag').textContent = tr('flag');
+    $('note').textContent = tr('note');
+    $('langRu').setAttribute('aria-pressed', lang === 'ru' ? 'true' : 'false');
+    $('langEn').setAttribute('aria-pressed', lang === 'en' ? 'true' : 'false');
+    elStatus.textContent = tr(lastSay[0], lastSay[1]);
+    paintSwitches();
+    paintHud();
+  }
+  function setLang(next) {
+    if (next === lang) return;
+    lang = next;
+    save('saper-lang', lang);
+    applyLang();
+  }
+
+  /* ---------- drawing ---------- */
+  function layout() {
+    var avail = (elField.clientWidth || 360) - 14;
+    cell = Math.max(12, Math.min(40, Math.floor(avail / cols)));
+    dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    cv.style.width = cols * cell + 'px';
+    cv.style.height = rows * cell + 'px';
+    cv.width = Math.round(cols * cell * dpr);
+    cv.height = Math.round(rows * cell * dpr);
+    dirty = true;
+  }
+  function rrect(x, y, w, h, r) {
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+  }
+  function drawFlag(x, y, c) {
+    var px = x + c * 0.4, top = y + c * 0.22, bottom = y + c * 0.76;
+    ctx.fillStyle = T.flag;
+    ctx.beginPath();
+    ctx.moveTo(px, top); ctx.lineTo(x + c * 0.74, y + c * 0.36); ctx.lineTo(px, y + c * 0.5);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = T['on-cover'];
+    ctx.lineWidth = Math.max(1.5, c * 0.07); ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(px, top); ctx.lineTo(px, bottom);
+    ctx.moveTo(x + c * 0.28, bottom); ctx.lineTo(x + c * 0.56, bottom);
+    ctx.stroke();
+  }
+  function drawMine(x, y, c) {
+    var cx = x + c / 2, cy = y + c / 2, r = c * 0.19;
+    ctx.strokeStyle = T.mine; ctx.fillStyle = T.mine;
+    ctx.lineWidth = Math.max(1.5, c * 0.08); ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (var k = 0; k < 8; k++) {
+      var a = k * Math.PI / 4;
+      ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * r * 1.6, cy + Math.sin(a) * r * 1.6);
+    }
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.2832); ctx.fill();
+  }
+  function draw() {
+    var c = cell, g = Math.max(0.5, c * 0.04), rad = c * 0.12, n = cols * rows, lost = status === 'lost';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cols * c, rows * c);
+    ctx.font = '700 ' + Math.round(c * 0.58) + 'px "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (var i = 0; i < n; i++) {
+      var x = (i % cols) * c, y = ((i / cols) | 0) * c;
+      var bare = open[i] || (lost && mine[i] && !flag[i]);
+      if (bare) {
+        ctx.fillStyle = i === boomAt ? T.boom : T.open;
+        rrect(x + g, y + g, c - g * 2, c - g * 2, rad); ctx.fill();
+        if (mine[i]) drawMine(x, y, c);
+        else if (adj[i]) { ctx.fillStyle = T['n' + adj[i]]; ctx.fillText(String(adj[i]), x + c / 2, y + c / 2 + c * 0.04); }
+        continue;
+      }
+      ctx.fillStyle = i === pressed ? T['cover-press'] : T.cover;
+      rrect(x + g, y + g, c - g * 2, c - g * 2, rad); ctx.fill();
+      if (i !== pressed) {
+        // a lighter top edge lifts the tile off the sheet
+        ctx.fillStyle = T['cover-hi'];
+        rrect(x + g, y + g, c - g * 2, Math.max(2, c * 0.1), rad); ctx.fill();
+      }
+      if (flag[i]) {
+        drawFlag(x, y, c);
+        if (lost && !mine[i]) {
+          ctx.strokeStyle = T.ink; ctx.lineWidth = Math.max(2, c * 0.08); ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(x + c * 0.2, y + c * 0.2); ctx.lineTo(x + c * 0.8, y + c * 0.8);
+          ctx.moveTo(x + c * 0.8, y + c * 0.2); ctx.lineTo(x + c * 0.2, y + c * 0.8);
+          ctx.stroke();
+        }
+      }
+    }
+    if (kb) {
+      ctx.strokeStyle = T.accent; ctx.lineWidth = Math.max(2, c * 0.09);
+      rrect((cursor % cols) * c + 1.5, ((cursor / cols) | 0) * c + 1.5, c - 3, c - 3, rad); ctx.stroke();
+    }
+  }
+  function frame() {
+    if (tickStart) paintTime(false);
+    if (dirty) { dirty = false; draw(); }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- input ---------- */
+  function setKb(on) { kb = on; elField.classList.toggle('kb', on); dirty = true; }
+  function cellAt(e) {
+    var r = cv.getBoundingClientRect();
+    var x = Math.floor((e.clientX - r.left) / (r.width / cols)), y = Math.floor((e.clientY - r.top) / (r.height / rows));
+    return (x < 0 || y < 0 || x >= cols || y >= rows) ? -1 : y * cols + x;
+  }
+  var down = null;
+  function release() {
+    if (down && down.timer) clearTimeout(down.timer);
+    down = null; pressed = -1; dirty = true;
+  }
+  cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  cv.addEventListener('pointerdown', function (e) {
+    var i = cellAt(e);
+    if (i < 0) return;
+    setKb(false); cursor = i;
+    if (e.pointerType === 'mouse' && (e.button === 2 || (e.button === 0 && e.ctrlKey))) { e.preventDefault(); toggleFlag(i); return; }
+    if (e.pointerType === 'mouse' && e.button === 1) { e.preventDefault(); chord(i); return; }
+    if (e.button !== 0) return;
+    down = { i: i, x: e.clientX, y: e.clientY, long: false, timer: 0 };
+    if (!open[i] && !over()) pressed = i;
+    if (e.pointerType !== 'mouse') {
+      down.timer = setTimeout(function () {
+        if (!down) return;
+        down.long = true; pressed = -1;
+        secondary(down.i);
+        try { if (navigator.vibrate) navigator.vibrate(15); } catch (err) { /* vibration is optional */ }
+      }, 380);
+    }
+    dirty = true;
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (down && Math.max(Math.abs(e.clientX - down.x), Math.abs(e.clientY - down.y)) > 10) release();
+  });
+  cv.addEventListener('pointerup', function (e) {
+    if (!down) return;
+    var d = down, i = cellAt(e);
+    release();
+    if (!d.long && i === d.i) primary(i);
+  });
+  cv.addEventListener('pointercancel', release);
+  cv.addEventListener('pointerleave', release);
+
+  elField.addEventListener('keydown', function (e) {
+    var x = cursor % cols, y = (cursor / cols) | 0, used = true;
+    if (e.key === 'ArrowLeft') x = Math.max(0, x - 1);
+    else if (e.key === 'ArrowRight') x = Math.min(cols - 1, x + 1);
+    else if (e.key === 'ArrowUp') y = Math.max(0, y - 1);
+    else if (e.key === 'ArrowDown') y = Math.min(rows - 1, y + 1);
+    else if (e.key === ' ' || e.key === 'Enter') { if (!e.repeat) { if (open[cursor]) chord(cursor); else reveal(cursor); } }
+    else if (e.code === 'KeyF') { if (!e.repeat) toggleFlag(cursor); }
+    else used = false;
+    if (!used) return;
+    e.preventDefault();
+    cursor = y * cols + x;
+    setKb(true);
+  });
+
+  $('diffs').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-diff]');
+    if (b) newGame(b.getAttribute('data-diff'));
+  });
+  $('newGame').addEventListener('click', function () { newGame(diff); });
+  $('modes').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-mode]');
+    if (!b) return;
+    mode = b.getAttribute('data-mode');
+    save('saper-mode', mode);
+    paintSwitches();
+  });
+  $('sound').addEventListener('click', function () {
+    soundOn = !soundOn; save('saper-sound', soundOn ? '1' : '0'); paintSwitches();
+    if (soundOn) tone(523, 0.12, 'triangle', 0.08);
+  });
+  $('langRu').addEventListener('click', function () { setLang('ru'); });
+  $('langEn').addEventListener('click', function () { setLang('en'); });
+
+  /* ---------- persistence ---------- */
+  function bits(a) { var s = ''; for (var i = 0; i < a.length; i++) s += a[i] ? '1' : '0'; return s; }
+  function snapshot() {
+    if (status !== 'play') return { d: diff };
+    var m = [];
+    for (var i = 0; i < mine.length; i++) if (mine[i]) m.push(i);
+    return { d: diff, c: cols, r: rows, m: m, o: bits(open), f: bits(flag), e: Math.round(elapsed()) };
+  }
+  function persist() { save('saper-state', JSON.stringify(snapshot())); }
+  function restore(d) {
+    if (!d || !DIFFS[d.d] || !Array.isArray(d.m) || typeof d.o !== 'string' || typeof d.f !== 'string') return false;
+    var D = DIFFS[d.d], n = d.c * d.r, i;
+    var shape = (d.c === D.c && d.r === D.r) || (d.c === D.r && d.r === D.c);
+    if (!shape || d.m.length !== D.m || d.o.length !== n || d.f.length !== n || !(d.e >= 0)) return false;
+    diff = d.d;
+    setField(d.c, d.r, D.m);
+    for (i = 0; i < d.m.length; i++) {
+      var at = d.m[i];
+      if (at !== (at | 0) || at < 0 || at >= n || mine[at]) return false;
+      mine[at] = 1;
+    }
+    countAdjacent();
+    for (i = 0; i < n; i++) {
+      if (d.o.charAt(i) === '1') { if (mine[i]) return false; open[i] = 1; opened++; }
+      else if (d.f.charAt(i) === '1') { flag[i] = 1; flags++; }
+    }
+    if (!opened || opened >= n - D.m) return false;
+    status = 'play';
+    baseMs = d.e; tickStart = performance.now();
+    say('play');
+    return true;
+  }
+
+  /* ---------- boot ---------- */
+  function boot(data) {
+    if (!data || !data.d) data = loadJson('saper-state', null);
+    readTokens();
+    if (restore(data)) { layout(); }
+    else newGame(data && DIFFS[data.d] ? data.d : load('saper-diff', 'beginner'));
+    applyLang();
+    requestAnimationFrame(frame);
+  }
+
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', readTokens);
+  }
+  new MutationObserver(readTokens).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (window.ResizeObserver) new ResizeObserver(function () { if (mine) layout(); }).observe(elField);
+  window.addEventListener('resize', function () { if (mine) layout(); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden && mine) persist(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { dirty = true; });
+
+  var hot = window.claude && window.claude.hot;
+  try { if (hot && hot.snapshot) hot.snapshot(snapshot); } catch (e) { /* no viewer hook */ }
+  if (hot && hot.ready) hot.ready(boot); else boot((hot && hot.data) || null);
+})();
+</script>
+</body>
+</html>

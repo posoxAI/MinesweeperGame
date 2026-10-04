@@ -1,74 +1,72 @@
-# Сапёр
+# Minesweeper
 
-Браузерная версия классической игры. На поле спрятаны мины; откройте все клетки без мин и ни разу не наступите на мину.
+[Русская версия](README.ru.md)
 
-*Minesweeper in the browser: open every cell that has no mine. Three classic field sizes, flags, a timer and best times, in Russian and English.*
+A browser version of the classic game. Mines are hidden in the field; open every cell that has no mine and never step on one. It has the three classic field sizes, flags, a timer and best times.
 
-**[Играть в браузере](https://posoxai.github.io/MinesweeperGame/)**
+**[Play in the browser](https://posoxai.github.io/MinesweeperGame/)**
 
 <p>
-  <img src="screenshots/day.png" width="300" alt="Сапёр в светлой теме: поле 16 на 16 в середине партии, часть мин отмечена флажками">
+  <img src="screenshots/day.png" width="300" alt="Minesweeper in the light theme with the Russian interface: a 16 by 16 field mid-game, with some mines flagged">
   <img src="screenshots/night.png" width="300" alt="The same game in the dark theme with the English interface, on the 9 by 9 field">
 </p>
 
-Слева светлая тема с русским интерфейсом, справа тёмная с английским.
+Left: the light theme with the Russian interface. Right: the dark theme with the English one.
 
-## Правила
+## Rules
 
-- Число в открытой клетке показывает, сколько мин в восьми соседних клетках.
-- Клетка без мин по соседству открывает всех своих соседей сама.
-- Флажок отмечает клетку, где вы предполагаете мину. Счётчик «Мин осталось» показывает число мин минус число флажков.
-- Наступили на мину — партия проиграна. Поле показывает все мины, а неверные флажки перечёркнуты.
-- Партия выиграна, когда открыты все клетки без мин. Ставить флажки для победы не обязательно.
+- A number in an open cell tells how many mines are in the eight cells around it.
+- A cell with no mines around it opens all its neighbours by itself.
+- A flag marks a cell where you think a mine is. The Mines left counter shows the number of mines minus the number of flags.
+- Step on a mine and the game is lost. The field then shows every mine, and wrong flags are crossed out.
+- The game is won when every cell without a mine is open. Flags are not needed to win.
 
-## Размеры поля
+## Field sizes
 
-| Сложность | Поле | Мин |
+| Difficulty | Field | Mines |
 | --- | --- | --- |
-| Новичок | 9 × 9 | 10 |
-| Любитель | 16 × 16 | 40 |
-| Профессионал | 30 × 16 | 99 |
+| Beginner | 9 × 9 | 10 |
+| Intermediate | 16 × 16 | 40 |
+| Expert | 30 × 16 | 99 |
 
-На узком экране поле «Профессионала» повёрнуто набок, 16 × 30, чтобы клетки оставались достаточно крупными для пальца.
+On a narrow screen the Expert field is turned on its side, 16 × 30, so the cells stay big enough to tap.
 
-## Первый ход
+## First move
 
-Мины расставляются после первого нажатия. В открытой клетке и восьми клетках вокруг неё мин не будет, поэтому первый ход всегда открывает участок поля.
+Mines are laid after the first click. The opened cell and the eight cells around it get no mines, so the first move always opens some ground.
 
-Дальше всё как в оригинале: поле не обязано решаться одной логикой, иногда приходится угадывать.
+After that it is the classic game: the field is not guaranteed to be solvable by logic alone, and sometimes you have to guess.
 
-## Управление
+## Controls
 
-- Мышь: левая кнопка открывает клетку, правая ставит или снимает флажок.
-- Нажатие на открытое число открывает его закрытых соседей, если флажков вокруг ровно столько же. Если флажок стоит неверно, так можно подорваться.
-- Телефон: нажатие открывает, долгое нажатие ставит флажок. Переключатель «Копать / Флажок» под полем меняет их местами.
-- Клавиатура: стрелки двигают курсор, пробел или Enter открывает клетку, F ставит флажок.
+- Mouse: the left button opens a cell, the right button plants or removes a flag.
+- A click on an open number opens its covered neighbours when exactly that many flags surround it. With a wrong flag this can set off a mine.
+- Phone: a tap opens, a long press plants a flag. The Dig / Flag switch under the field swaps the two.
+- Keyboard: arrow keys move the cursor, Space or Enter opens a cell, F plants a flag.
 
-Время идёт с первого открытия клетки. Рекорд хранится отдельно для каждой сложности, с точностью до десятой секунды. Незаконченная партия, рекорды и настройки хранятся в браузере игрока.
+The clock starts with the first opened cell. A best time is kept for each difficulty, to a tenth of a second. An unfinished game, the best times and the settings are kept in the player's browser.
 
-## Язык
+## Language
 
-Интерфейс на русском и английском. Русский включается сам, если он есть в списке языков браузера, иначе игра открывается на английском. Переключатель RU/EN запоминает выбор.
+The interface is in English and Russian. It opens in Russian when Russian is among the browser's languages and in English otherwise. The RU/EN switch remembers your choice.
 
-*The interface is in Russian and English. It opens in Russian when Russian is among the browser's languages and in English otherwise; the RU/EN switch remembers your choice.*
+## How to run
 
-## Как запустить
+The whole game is one file, `index.html`. There is no build step and there are no dependencies.
 
-Вся игра лежит в одном файле `index.html`. Сборка и зависимости не нужны.
+- Locally: open `index.html` in a browser.
+- Online: the game is published with GitHub Pages at https://posoxai.github.io/MinesweeperGame/. Every commit to `main` updates it automatically.
 
-- Локально: откройте `index.html` в браузере.
-- По ссылке: игра опубликована через GitHub Pages по адресу https://posoxai.github.io/MinesweeperGame/. Каждый коммит в `main` обновляет её автоматически.
+Fonts load from Google Fonts. Without a network the game falls back to system fonts.
 
-Шрифты загружаются с Google Fonts. Без сети игра работает на системных шрифтах.
+## Credits
 
-## Авторство
+The game was written by Claude, the AI assistant made by Anthropic: the logic, the canvas graphics, the sound and the page design.
 
-Игру написал Claude, ИИ-ассистент компании Anthropic: логику, графику на canvas, звук и оформление страницы.
+The rules and the three field sizes come from the classic Minesweeper known from Windows. The design of this version is its own.
 
-Правила и три размера поля взяты из классического «Сапёра», известного по Windows. Оформление этой версии своё.
+The idea of making a browser version came from posoxAI.
 
-Идея сделать браузерную версию принадлежит posoxAI.
+## License
 
-## Лицензия
-
-MIT. Полный текст в файле [LICENSE](LICENSE).
+MIT. The full text is in [LICENSE](LICENSE).

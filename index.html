@@ -101,12 +101,11 @@
     font-family: var(--body);
     font-size: 16px;
     line-height: 1.45;
-    padding-inline: 16px;
-    padding-block: 14px 22px;
+    padding: 14px 16px 22px;
   }
   .app {
-    width: min(100%, 760px);
-    margin-inline: auto;
+    max-width: 760px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -180,6 +179,17 @@
   .status { margin: 0; min-height: 1.45em; font-weight: 700; }
   .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .note { margin: 0; color: var(--muted); font-size: 14px; max-width: 68ch; }
+
+  /* Browsers without gap in flex rows (Safari before 14.1, so every iPad stuck on iOS 9 or 12) get the
+     same spacing from margins. The class is set by the script after it measures whether gap works. */
+  .nogap .app > * + * { margin-top: 12px; }
+  .nogap .bar > *, .nogap .stats > *, .nogap .controls > * { margin-bottom: 10px; }
+  .nogap .bar, .nogap .stats, .nogap .controls { margin-bottom: -10px; }
+  .nogap .bar > * + * { margin-left: 12px; }
+  .nogap .stats > * + * { margin-left: 28px; }
+  .nogap .stats > .push { margin-left: auto; }
+  .nogap .controls > * { margin-bottom: 8px; margin-right: 8px; }
+  .nogap .controls { margin-bottom: -8px; }
 </style>
 </head>
 <body>
@@ -233,6 +243,55 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var elField = $('field'), cv = $('cv'), ctx = cv.getContext('2d'), elStatus = $('status');
+
+  /* ---------- old browsers ---------- */
+  // Flex rows space their items with gap; where gap does nothing in a flex row the page falls back to margins.
+  (function () {
+    var t = document.createElement('div');
+    t.style.cssText = 'display:flex;flex-direction:column;gap:1px;position:absolute;visibility:hidden';
+    t.appendChild(document.createElement('div'));
+    t.appendChild(document.createElement('div'));
+    document.body.appendChild(t);
+    if (t.scrollHeight !== 1) document.documentElement.className += ' nogap';
+    document.body.removeChild(t);
+  })();
+
+  // The field listens for pointer events. Safari before 13 has none, so there the same handlers are fed from
+  // touch events, and from mouse events on an old desktop. The fake event carries only what the handlers read.
+  function onPointer(el, h) {
+    if (window.PointerEvent) {
+      el.addEventListener('pointerdown', h.down);
+      el.addEventListener('pointermove', h.move);
+      el.addEventListener('pointerup', h.up);
+      el.addEventListener('pointercancel', h.cancel);
+      el.addEventListener('pointerleave', h.cancel);
+      return;
+    }
+    var lastTouch = 0;
+    function fake(src, type, e) {
+      return { clientX: src.clientX, clientY: src.clientY, button: e.button || 0, ctrlKey: !!e.ctrlKey,
+               pointerType: type, preventDefault: function () { e.preventDefault(); } };
+    }
+    function touch(fn) {
+      return function (e) {
+        lastTouch = Date.now();
+        var t = e.changedTouches && e.changedTouches[0];
+        if (t) fn(fake(t, 'touch', e));
+      };
+    }
+    function mouse(fn) {
+      // A tap also fires emulated mouse events afterwards; those are the touch again and are ignored.
+      return function (e) { if (Date.now() - lastTouch > 800) fn(fake(e, 'mouse', e)); };
+    }
+    el.addEventListener('touchstart', touch(h.down));
+    el.addEventListener('touchmove', touch(h.move));
+    el.addEventListener('touchend', touch(h.up));
+    el.addEventListener('touchcancel', h.cancel);
+    el.addEventListener('mousedown', mouse(h.down));
+    el.addEventListener('mousemove', mouse(h.move));
+    el.addEventListener('mouseup', mouse(h.up));
+    el.addEventListener('mouseleave', h.cancel);
+  }
 
   /* ---------- storage (optional) ---------- */
   function load(key, fallback) {
@@ -536,7 +595,14 @@
   }
   function rrect(x, y, w, h, r) {
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+    if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+    r = Math.min(r, w / 2, h / 2);
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
   }
   function drawFlag(x, y, c) {
     var px = x + c * 0.4, top = y + c * 0.22, bottom = y + c * 0.76;
@@ -621,7 +687,7 @@
     down = null; pressed = -1; dirty = true;
   }
   cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-  cv.addEventListener('pointerdown', function (e) {
+  function pDown(e) {
     var i = cellAt(e);
     if (i < 0) return;
     setKb(false); cursor = i;
@@ -639,18 +705,17 @@
       }, 380);
     }
     dirty = true;
-  });
-  cv.addEventListener('pointermove', function (e) {
+  }
+  function pMove(e) {
     if (down && Math.max(Math.abs(e.clientX - down.x), Math.abs(e.clientY - down.y)) > 10) release();
-  });
-  cv.addEventListener('pointerup', function (e) {
+  }
+  function pUp(e) {
     if (!down) return;
     var d = down, i = cellAt(e);
     release();
     if (!d.long && i === d.i) primary(i);
-  });
-  cv.addEventListener('pointercancel', release);
-  cv.addEventListener('pointerleave', release);
+  }
+  onPointer(cv, { down: pDown, move: pMove, up: pUp, cancel: function () { release(); } });
 
   elField.addEventListener('keydown', function (e) {
     var x = cursor % cols, y = (cursor / cols) | 0, used = true;
